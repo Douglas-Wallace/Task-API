@@ -4,18 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-// FORNECIDA — ajuste URL, usuário e senha conforme a sua instalação do MySQL.
+// Credenciais vêm de variáveis de ambiente (TASKDB_URL, TASKDB_USER, TASKDB_PASS)
 public class ConnectionFactory {
 
-    private static final String URL  = "jdbc:mysql://localhost:3306/taskdb";
-    private static final String USER = "root";
-    private static final String PASS = "";
+    private final String url  = config("TASKDB_URL", "jdbc:mysql://localhost:3306/taskdb");
+    private final String user = config("TASKDB_USER", "root");
+    private final String pass = config("TASKDB_PASS", "");
 
-    public Connection getConnection() {
-        try {
-            return DriverManager.getConnection(URL, USER, PASS);
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao conectar no banco", e);
-        }
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, pass);
+    }
+
+    private static String config(String chave, String padrao) {
+        String valor = System.getProperty(chave, System.getenv(chave));
+        return valor != null ? valor : padrao;
     }
 }
