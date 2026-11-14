@@ -1,5 +1,6 @@
 package br.edu.ifsp.web.servlet;
 
+import br.edu.ifsp.web.listener.SessaoListener;
 import br.edu.ifsp.web.model.Usuario;
 import br.edu.ifsp.web.service.AutenticacaoService;
 import br.edu.ifsp.web.service.DadosInvalidosException;
@@ -90,6 +91,7 @@ public class AuthController extends HttpServlet {
         }
         Map<String, Object> corpo = new LinkedHashMap<>();
         corpo.put("usuario", usuario);
+        corpo.put("sessoesAtivas", SessaoListener.sessoesAtivas());
         RespostaJson.enviar(resp, HttpServletResponse.SC_OK, corpo);
     }
 

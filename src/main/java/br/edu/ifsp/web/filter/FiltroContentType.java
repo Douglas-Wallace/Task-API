@@ -7,7 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -16,7 +15,6 @@ import java.io.IOException;
 // BÔNUS: POST e PUT só passam se o corpo for declarado como JSON.
 // Caso contrário, o filtro "fecha a porta" com 415 e a requisição
 // nem chega ao FrontController.
-@WebFilter("/tarefas/*")
 public class FiltroContentType implements Filter {
 
     @Override
