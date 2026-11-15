@@ -31,10 +31,10 @@ As senhas ficam no banco como hash PBKDF2-SHA256 com salt.
 
 ## Importador
 
-Compile e rode fora do Tomcat (no Windows o separador de classpath é `;`):
+Compile e rode fora do Tomcat (no Windows o separador de classpath é `;`). No Git Bash, escreva o caminho do Tomcat como `C:/...`, não `/c/...`. O `--release 17` evita erro quando o `javac` é mais novo que o `java`:
 
 ```bash
-javac -d out -cp "<tomcat>/lib/servlet-api.jar;src/main/webapp/WEB-INF/lib/gson-2.11.0.jar" $(find src/main/java -name "*.java")
+javac --release 17 -d out -cp "<tomcat>/lib/servlet-api.jar;src/main/webapp/WEB-INF/lib/gson-2.11.0.jar" $(find src/main/java -name "*.java")
 ```
 
 ```bash
@@ -57,22 +57,27 @@ curl -i -b c.txt $B/tarefas
 
 | Etapa | Esperado | Obtido |
 |---|---|---|
-| 1 | 401 com JSON | |
-| 2 | 401 | |
-| 3 | 200, sem credencial, sessão nova | |
-| 4 | 200 só com tarefas de A | |
-| 5 | 404 em GET/PUT/PATCH/DELETE na tarefa de B | |
-| 6 | 400 | |
-| 7 | 201 com id | |
-| 8 | 204 e depois 409 | |
-| 9 | 200 com usuário e sessões ativas | |
-| 10 | 204 e 401 | |
-| 11 | conclui os de A, informa os demais | |
+| 1 | 401 com JSON | 401 `{"erro":"Usuario nao autenticado."}` |
+| 2 | 401 | 401 `{"erro":"E-mail ou senha invalidos."}` |
+| 3 | 200, sem credencial, sessão nova | 200 `{"id":1,"nome":"Ana Souza","email":"ana@taskapi.test"}`, sem senha/hash, com `Set-Cookie: JSESSIONID=...; HttpOnly` |
+| 4 | 200 só com tarefas de A | 200 com as tarefas 1, 2, 4 e 5, todas `usuarioId: 1` |
+| 5 | 404 em GET/PUT/PATCH/DELETE na tarefa de B | 404 `{"erro":"Tarefa 6 nao encontrada."}` nos quatro métodos |
+| 6 | 400 | 400 `{"erro":"Titulo obrigatorio."}` |
+| 7 | 201 com id | 201 `{"id":9,"usuarioId":1,"titulo":"Testar roteiro",...,"concluida":false}` |
+| 8 | 204 e depois 409 | 204 e depois 409 `{"erro":"Tarefa ja concluida."}` |
+| 9 | 200 com usuário e sessões ativas | 200 `{"usuario":{"id":1,"nome":"Ana Souza",...},"sessoesAtivas":1}` |
+| 10 | 204 e 401 | 204 no logout e depois 401 `{"erro":"Usuario nao autenticado."}` |
+| 11 | conclui os de A, informa os demais | ids `4, 1, 7, 99` como Ana: `4: concluida`, `1: ja estava concluida`, `7: nao encontrada` (é do Bruno), `99: nao encontrada` |
 
 Prints em `docs/`:
 
-- `docs/console-sessoes-tempo.png`
-- `docs/importador-etapa11.png`
+Console do Tomcat com o listener de sessões e o filtro de tempo (`docs/console-sessoes-tempo.png`):
+
+![Console com sessões e tempo de execução](docs/console-sessoes-tempo.png)
+
+Saída do importador na etapa 11 (`docs/importador-etapa11.png`):
+
+![Saída do importador](docs/importador-etapa11.png)
 
 ## Relatório
 
