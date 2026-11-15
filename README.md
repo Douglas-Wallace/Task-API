@@ -16,6 +16,8 @@ Os `.jar` ficam em `src/main/webapp/WEB-INF/lib` e não são versionados.
 - Banco novo: `schema.sql`
 - Banco da Tarefa 02: `migracao-03.sql`
 
+No MySQL Workbench, a migração esbarra no *safe update mode* (erro 1175). Rode antes `SET SQL_SAFE_UPDATES = 0;` na mesma aba.
+
 A conexão lê `TASKDB_URL`, `TASKDB_USER` e `TASKDB_PASS` (variável de ambiente ou `-D`). Padrão: `jdbc:mysql://localhost:3306/taskdb`, `root`, senha vazia.
 
 ### Usuários de teste
@@ -43,8 +45,10 @@ O arquivo tem um id por linha. Cada linha imprime `concluida`, `nao encontrada` 
 
 ## Roteiro de verificação (item 09)
 
+O contexto da aplicação é `/aula-taskapi` (nome do projeto no Eclipse).
+
 ```bash
-B=http://localhost:8080/taskapi
+B=http://localhost:8080/aula-taskapi
 curl -i $B/tarefas
 curl -i -c c.txt -b c.txt -H "Content-Type: application/json" -d '{"email":"ana@taskapi.test","senha":"errada"}' $B/auth/login
 curl -i -c c.txt -b c.txt -H "Content-Type: application/json" -d '{"email":"ana@taskapi.test","senha":"ana123"}' $B/auth/login
